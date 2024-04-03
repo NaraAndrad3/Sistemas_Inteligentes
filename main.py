@@ -1,5 +1,7 @@
 
-""" Controlar a dição de obstáculos: ex: eles não podem ficar sobrescritos e nem lado a lado """
+""" CONTROLAR A ADIÇÃO DE OBSTÁCULOS
+    AJEITAR A PARTE DO OBSTÁCULO NO PONTO INICIAL
+"""
 
 import heapq
 import random
@@ -106,21 +108,35 @@ def plot_grid(obstacles, path):
     plt.show()
 
 
-def gerar_obstaculos_aleatoriamente(grid_size, num_obstaculos):
-    obstaculos = set()
-    while len(obstaculos) < num_obstaculos:
+def generate_obstacles(start, grid_size, num_obstacles):
+    obstacles = set()
+    
+    # Adiciona o ponto inicial à lista de obstáculos temporariamente
+    obstacles.add((start.x, start.y))
+    
+    while len(obstacles) < num_obstacles + 1:  # Adiciona 1 para compensar o ponto inicial
         x = random.randint(0, grid_size - 1)
         y = random.randint(0, grid_size - 1)
-        if not any(abs(x - obs_x) <= 1 and abs(y - obs_y) <= 1 for obs_x, obs_y in obstaculos):
-            obstaculos.add((x, y))
-    return obstaculos
+        if not any(abs(x - obs_x) <= 1 and abs(y - obs_y) <= 1 for obs_x, obs_y in obstacles):
+            obstacles.add((x, y))
+    
+    # Remove o ponto inicial da lista de obstáculos
+    obstacles.remove((start.x, start.y))
+    
+    return obstacles
 
 
 def main():
     start = Node(0, 0)
+<<<<<<< HEAD
     goal = Node(10, 10)
     #obstacles = {(2, 3), (3, 3), (6, 4), (5, 5),(1,1)}  
     obstacles = gerar_obstaculos_aleatoriamente(12, 15)
+=======
+    goal = Node(10,10)
+    #obstacles = {(2, 3), (3, 3), (6, 4), (5, 5),(1,1)}  
+    obstacles = generate_obstacles(start, 12, 30)
+>>>>>>> 8ce8f2f70ad74f1b8502847cedeb3d0b8f627727
     
     path = a_star(start, goal, obstacles)
     
