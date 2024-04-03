@@ -3,6 +3,7 @@
 
 
 import heapq
+import random
 import matplotlib.pyplot as plt
 
 class Node:
@@ -32,12 +33,18 @@ essa nova coordenada está dentroda lista de obstáculos, se não estiver, ele �
 """
 def neighbors(node, obstacles):
     neighbors = []
-    moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)] 
+    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Movimentos ortogonais básicos
+    
+    # Adicionando movimentos ortogonais ao longo das laterais dos obstáculos
+    moves += [(dx, dy) for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)] for x, y in [(node.x + dx, node.y + dy)] if (x, y) in obstacles]
+    
     for dx, dy in moves:
-        new_x, new_y = node.x + dx, node.y + dy # -----> esse cálculo vai atualizar a posição do 'bonequin' pra poder verificar se o movimento é válido
-        if (new_x, new_y) not in obstacles: # ------> se essa coordenada não estiver dentro da lista de obstáculos, ele é adicionado como vizinho
-            neighbors.append(Node(new_x, new_y))
+        new_x, new_y = node.x + dx, node.y + dy
+        if 0 <= new_x <= 10 and 0 <= new_y <= 10:  # Verifica se as coordenadas estão dentro dos limites
+            if (new_x, new_y) not in obstacles:
+                neighbors.append(Node(new_x, new_y))
     return neighbors
+
 
 
 def a_star(start, goal, obstacles):
@@ -59,7 +66,10 @@ def a_star(start, goal, obstacles):
             return path[::-1]
 
         closed_set.add((current.x, current.y))
-
+        
+        if not neighbors:  # Se não houver vizinhos disponíveis
+            continue
+        
         for neighbor in neighbors(current, obstacles):
             if (neighbor.x, neighbor.y) in closed_set:
                 continue
@@ -78,16 +88,16 @@ def plot_grid(obstacles, path):
     fig, ax = plt.subplots()
 
     for obstacle in obstacles:
-        ax.add_patch(plt.Rectangle((obstacle[0], obstacle[1]), 1, 1, color='gray'))
+        ax.add_patch(plt.Rectangle((obstacle[0], obstacle[1]), 1, 1, color='blue'))
 
     if path:
         for i in range(len(path) - 1):
             x1, y1 = path[i]
             x2, y2 = path[i + 1]
-            ax.plot([x1 + 0.5, x2 + 0.5], [y1 + 0.5, y2 + 0.5], color='blue')
+            ax.plot([x1 + 0.5, x2 + 0.5], [y1 + 0.5, y2 + 0.5], color='red')
 
-    ax.set_xticks(range(12))  # Define os ticks do eixo x em incrementos de 1
-    ax.set_yticks(range(12))  # Define os ticks do eixo y em incrementos de 1
+    ax.set_xticks(range(12))  
+    ax.set_yticks(range(12))  
     
     ax.set_xlim(0, 11)
     ax.set_ylim(0, 11)
@@ -95,13 +105,26 @@ def plot_grid(obstacles, path):
     plt.grid(True)
     plt.show()
 
+def gerar_obstaculos_aleatoriamente(grid_size, num_obstaculos):
+    obstaculos = set()
+    while len(obstaculos) < num_obstaculos:
+        x = random.randint(0, grid_size - 1)
+        y = random.randint(0, grid_size - 1)
+        if not any(abs(x - obs_x) <= 1 and abs(y - obs_y) <= 1 for obs_x, obs_y in obstaculos):
+            obstaculos.add((x, y))
+    return obstaculos
+
 
 def main():
     start = Node(0, 0)
-    goal = Node(10, 10)
-    obstacles = {(2, 3), (3, 3), (6, 4), (5, 5),(1,1)}  # Exemplo de obstáculos
-
+    goal = Node(8,5)
+    #obstacles = {(2, 3), (3, 3), (6, 4), (5, 5),(1,1)}  
+    obstacles = gerar_obstaculos_aleatoriamente(12, 8)
+    
     path = a_star(start, goal, obstacles)
+    
+    print(obstacles)
+    
     if path:
         print("Caminho encontrado:")
         print(path)
