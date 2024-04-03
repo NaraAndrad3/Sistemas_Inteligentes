@@ -1,5 +1,7 @@
 
-""" Controlar a dição de obstáculos: ex: eles não podem ficar sobrescritos e nem lado a lado """
+""" CONTROLAR A ADIÇÃO DE OBSTÁCULOS
+    AJEITAR A PARTE DO OBSTÁCULO NO PONTO INICIAL
+"""
 
 
 import heapq
@@ -89,13 +91,13 @@ def plot_grid(obstacles, path):
     fig, ax = plt.subplots()
 
     for obstacle in obstacles:
-        ax.add_patch(plt.Rectangle((obstacle[0], obstacle[1]), 1, 1, color='blue'))
+        ax.add_patch(plt.Rectangle((obstacle[0], obstacle[1]), 1, 1, color='gray'))
 
     if path:
         # Ajustar o trajeto para começar nos cantos das células do grid
         adjusted_path = [(x, y) for x, y in path]
         x_values, y_values = zip(*adjusted_path)
-        ax.plot(x_values, y_values, color='red')
+        ax.plot(x_values, y_values, color='blue')
 
     ax.set_xticks(range(12))  # Define os ticks do eixo x em incrementos de 1
     ax.set_yticks(range(12))  # Define os ticks do eixo y em incrementos de 1
@@ -107,21 +109,29 @@ def plot_grid(obstacles, path):
     plt.show()
 
 
-def gerar_obstaculos_aleatoriamente(grid_size, num_obstaculos):
-    obstaculos = set()
-    while len(obstaculos) < num_obstaculos:
+def generate_obstacles(start, grid_size, num_obstacles):
+    obstacles = set()
+    
+    # Adiciona o ponto inicial à lista de obstáculos temporariamente
+    obstacles.add((start.x, start.y))
+    
+    while len(obstacles) < num_obstacles + 1:  # Adiciona 1 para compensar o ponto inicial
         x = random.randint(0, grid_size - 1)
         y = random.randint(0, grid_size - 1)
-        if not any(abs(x - obs_x) <= 1 and abs(y - obs_y) <= 1 for obs_x, obs_y in obstaculos):
-            obstaculos.add((x, y))
-    return obstaculos
+        if not any(abs(x - obs_x) <= 1 and abs(y - obs_y) <= 1 for obs_x, obs_y in obstacles):
+            obstacles.add((x, y))
+    
+    # Remove o ponto inicial da lista de obstáculos
+    obstacles.remove((start.x, start.y))
+    
+    return obstacles
 
 
 def main():
     start = Node(0, 0)
-    goal = Node(8,5)
+    goal = Node(10,10)
     #obstacles = {(2, 3), (3, 3), (6, 4), (5, 5),(1,1)}  
-    obstacles = gerar_obstaculos_aleatoriamente(12, 8)
+    obstacles = generate_obstacles(start, 12, 30)
     
     path = a_star(start, goal, obstacles)
     
