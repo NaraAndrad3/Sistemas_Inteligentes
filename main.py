@@ -33,17 +33,18 @@ essa nova coordenada está dentroda lista de obstáculos, se não estiver, ele �
 """
 def neighbors(node, obstacles):
     neighbors = []
-    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Movimentos ortogonais básicos
-    
+    moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)]  # Movimentos ortogonais básicos
+
     # Adicionando movimentos ortogonais ao longo das laterais dos obstáculos
-    moves += [(dx, dy) for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)] for x, y in [(node.x + dx, node.y + dy)] if (x, y) in obstacles]
-    
+    moves += [(dx, dy) for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)] for x, y in [(node.x + dx, node.y + dy)] if (x, y) in obstacles]
+
     for dx, dy in moves:
         new_x, new_y = node.x + dx, node.y + dy
         if 0 <= new_x <= 10 and 0 <= new_y <= 10:  # Verifica se as coordenadas estão dentro dos limites
-            if (new_x, new_y) not in obstacles:
+            if (new_x, new_y) not in obstacles or (node.x + dx, node.y) in obstacles or (node.x, node.y + dy) in obstacles:
                 neighbors.append(Node(new_x, new_y))
     return neighbors
+
 
 
 
@@ -91,19 +92,20 @@ def plot_grid(obstacles, path):
         ax.add_patch(plt.Rectangle((obstacle[0], obstacle[1]), 1, 1, color='blue'))
 
     if path:
-        for i in range(len(path) - 1):
-            x1, y1 = path[i]
-            x2, y2 = path[i + 1]
-            ax.plot([x1 + 0.5, x2 + 0.5], [y1 + 0.5, y2 + 0.5], color='red')
+        # Ajustar o trajeto para começar nos cantos das células do grid
+        adjusted_path = [(x, y) for x, y in path]
+        x_values, y_values = zip(*adjusted_path)
+        ax.plot(x_values, y_values, color='red')
 
-    ax.set_xticks(range(12))  
-    ax.set_yticks(range(12))  
+    ax.set_xticks(range(12))  # Define os ticks do eixo x em incrementos de 1
+    ax.set_yticks(range(12))  # Define os ticks do eixo y em incrementos de 1
     
     ax.set_xlim(0, 11)
     ax.set_ylim(0, 11)
     ax.set_aspect('equal', adjustable='box')
     plt.grid(True)
     plt.show()
+
 
 def gerar_obstaculos_aleatoriamente(grid_size, num_obstaculos):
     obstaculos = set()
