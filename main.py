@@ -1,7 +1,6 @@
 
 """ Controlar a dição de obstáculos: ex: eles não podem ficar sobrescritos e nem lado a lado """
 
-
 import heapq
 import random
 import matplotlib.pyplot as plt
@@ -119,9 +118,9 @@ def gerar_obstaculos_aleatoriamente(grid_size, num_obstaculos):
 
 def main():
     start = Node(0, 0)
-    goal = Node(8,5)
+    goal = Node(10, 10)
     #obstacles = {(2, 3), (3, 3), (6, 4), (5, 5),(1,1)}  
-    obstacles = gerar_obstaculos_aleatoriamente(12, 8)
+    obstacles = gerar_obstaculos_aleatoriamente(12, 15)
     
     path = a_star(start, goal, obstacles)
     
