@@ -1,53 +1,41 @@
-def verifica_ataque(solucao):
-    for i in range(1, len(solucao)):
-        for j in range(0, i):
-            a, b = solucao[i]
-            c, d = solucao[j]
-            if a == c or b == d or abs(a - c) == abs(b - d):
+def verifica_ataque(rainhas):
+    for i in range(len(rainhas)):
+        for j in range(i + 1, len(rainhas)):
+            x1, y1 = rainhas[i]
+            x2, y2 = rainhas[j]
+            if x1 == x2 or y1 == y2 or abs(x1 - x2) == abs(y1 - y2):
                 return True
     return False
 
-def dfs(size):
-    pilha = [[]]  # armazena a organização das rainhas
-    solucoes = []
+def dfs(linha, rainhas):
+    if linha == 8:
+        return [rainhas.copy()]
 
-    if size < 1:
-        return []
+    solutions = []
+    for coluna in range(8):
+        rainha = (linha, coluna)
+        rainhas.append(rainha)
+        if not verifica_ataque(rainhas):
+            for child in dfs(linha + 1, rainhas):
+                solutions.append(child)
+        rainhas.pop()
 
-    while pilha:
-        sol = pilha.pop()
-        row = len(sol)
+    return solutions
 
-        if row == size:
-            if not verifica_ataque(sol):
-                solucoes.append(sol)
-            continue
-
-        if row < size:
-            for col in range(size):
-                queen = (row, col) # cria uma rainha
-                queens = sol.copy()
-                queens.append(queen)
-                pilha.append(queens)
-
-    return solucoes
-
-def mostra_tabuleiro(size, solucoes):
-    for i in range(size):
-        #print(' ---' * size)
-        for j in range(size):
-            p = 'X' if (i, j) in solucoes else '*'
-            print('| %s ' % p, end='')
-        print('|')
-    #print(' --- ' * size)
-    print('\n')
+def mostra_tabuleiro(rainhas):
+    tabuleiro = [['.' for _ in range(8)] for _ in range(8)]
+    for rainha in rainhas:
+        tabuleiro[rainha[0]][rainha[1]] = 'X'
+    for linha in tabuleiro:
+        print(' '.join(linha))
 
 def main():
-    size = 8
-    row = 0
-    solutions = dfs(size)
+    rainhas = []
+    solutions = dfs(0, rainhas)
 
     for i, sol in enumerate(solutions):
-        mostra_tabuleiro(size,sol)
+        print(f'Solução {i + 1}:')
+        mostra_tabuleiro(sol)
+        print()
 
 main()
