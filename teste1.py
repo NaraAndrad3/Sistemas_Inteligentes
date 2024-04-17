@@ -25,13 +25,18 @@ def obter_vizinhos(no, tamanho_grade, obstaculos):
     
     # Itera sobre os movimentos
     for dx, dy in movimentos:
-        # Calcula as coordenadas do novo vizinho
+        # Calcula as coordenadas do vértice vizinho
         novo_x, novo_y = no.x + dx, no.y + dy
-        # Verifica se as coordenadas estão dentro dos limites da grade e se não são um obstáculo
-        if 0 <= novo_x < tamanho_grade and 0 <= novo_y < tamanho_grade and (novo_x, novo_y) not in obstaculos:
-            # Adiciona o novo vizinho à lista de vizinhos válidos
-            vizinhos.append(No(novo_x, novo_y, ant=no))
+        # Calcula as coordenadas do vértice oposto (diagonal)
+        novo_x_oposto, novo_y_oposto = no.x + dx, no.y + dy
+        # Verifica se as coordenadas do vértice vizinho estão dentro dos limites da grade
+        if 0 <= novo_x < tamanho_grade and 0 <= novo_y < tamanho_grade:
+            # Verifica se há obstáculos na diagonal entre o vértice atual e o vértice vizinho
+            if (no.x, novo_y) not in obstaculos and (novo_x, no.y) not in obstaculos:
+                # Adiciona o vértice vizinho à lista de vizinhos válidos
+                vizinhos.append(No(novo_x, novo_y, ant=no))
     return vizinhos
+
 
 def bfs(inicio, destino, tamanho_grade, obstaculos):
     # Conjunto para armazenar os nós visitados
